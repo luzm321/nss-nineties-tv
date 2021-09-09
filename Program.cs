@@ -33,6 +33,8 @@ namespace NinetiesTV
             Print("Most Words in Title", WordieastName(shows));
             Print("All Names", AllNamesWithCommas(shows));
             Print("All Names with And", AllNamesWithCommasPlsAnd(shows));
+            Print("All Unique Genre Shows", UniqueGenres(shows));
+            Print("All Eighties Show Genres", EightiesShowGenres(shows));
         }
 
         /**************************************************************************************************
@@ -191,19 +193,31 @@ namespace NinetiesTV
         // 21. Return the show with the most words in the name.
         static Show WordieastName(List<Show> shows)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
+            // Splits() method separates a string into a maximum number of substrings based on the provided character separator.
+            return shows.OrderByDescending(s => s.Name.Split(" ").Count()).FirstOrDefault();
         }
 
         // 22. Return the names of all shows as a single string seperated by a comma and a space.
         static string AllNamesWithCommas(List<Show> shows)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
+            List<string> concatenatedShowNames = shows.Select(s => s.Name).ToList();
+            return String.Join(", ", concatenatedShowNames);
         }
 
         // 23. Do the same as above, but put the word "and" between the second-to-last and last show name.
         static string AllNamesWithCommasPlsAnd(List<Show> shows)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
+            // Can use IEnumerable to utilize static Join() method on String class as well...
+            List<string> allShowsMinusLastTwo = shows.Take(shows.Count() - 2).Select(s => s.Name).ToList();
+            List<string> last2Shows = shows.Skip(shows.Count() - 2).Select(s => s.Name).ToList();
+
+            var concatenatedShowNames = String.Join(", ", allShowsMinusLastTwo);
+            concatenatedShowNames += $", {String.Join(" and ", last2Shows)}";
+
+            return concatenatedShowNames;
         }
 
 
@@ -220,7 +234,22 @@ namespace NinetiesTV
         **************************************************************************************************/
 
         // 1. Return the genres of the shows that started in the 80s.
+        static string EightiesShowGenres(List<Show> shows)
+        {
+            List<Show> eightiesGenreShows = shows.Where(s => s.StartYear >= 1980 && s.StartYear < 1990).ToList();
+            List<string> eightiesGenres = eightiesGenreShows.SelectMany(s => s.Genres).Distinct().OrderBy(genre => genre).ToList();
+            return String.Join(", ", eightiesGenres);
+        }
+
         // 2. Print a unique list of geners.
+        // SelectMany flattens queries that return lists of lists so it returns only th genre names; allows to select a value from 
+        // multiple collections like a cross-join in SQL; allows you to eliminate need for a second select or a loop:
+        static string UniqueGenres(List<Show> shows)
+        {
+            List<string> uniqueShowGenres = shows.SelectMany(s => s.Genres).Distinct().OrderBy(genre => genre).ToList();
+            return String.Join(", ", uniqueShowGenres);
+        }
+
         // 3. Print the years 1987 - 2018 along with the number of shows that started in each year (note many years will have zero shows)
         // 4. Assume each episode of a comedy is 22 minutes long and each episode of a show that isn't a comedy is 42 minutes. How long would it take to watch every episode of each show?
         // 5. Assume each show ran each year between its start and end years (which isn't true), which year had the highest average IMDB rating.
